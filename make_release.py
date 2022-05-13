@@ -233,8 +233,8 @@ def patch_mac(file_name):
 
     return new_name
 
-    os.system(f'rm -rf {TRANS_RELEASE_FOLDER}')
-    os.makedirs(f'{TRANS_RELEASE_FOLDER}')
+if __name__ == '__main__':
+
     os.chdir(TRANS_RELEASE_FOLDER)
 
 
