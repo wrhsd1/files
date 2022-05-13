@@ -108,11 +108,12 @@ def patch_mac(file_name):
     return new_name
 
 
- 
-    # 打补丁
+list_data=os.listdir(TRANS_RELEASE_FOLDER_MAC) 
+for fmac in list_data:
+       # 打补丁
     # patch
 
     # linux
-patch_mac(os.listdir(TRANS_RELEASE_FOLDER_MAC))
+    patch_mac(fmac)
 
     
