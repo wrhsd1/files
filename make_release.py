@@ -19,6 +19,81 @@ TRANS_RELEASE_FOLDER = '/workdir/trilium-trans-release/'
 PATCH_FOLDER = '/workdir/trilium-trans-patch/'
 BASE_FOLDER = '/workdir/trilium-trans/'
 
+DO_DOWNLOAD = False
+
+# 是否删除临时文件
+# whether delete template files
+DO_DELETE = False
+
+
+# DO_DELETE = False
+
+
+def requests_get(url):
+    ret = None
+    try:
+        ret = requests.get(url, proxies=PROXIES, verify=not USE_PROXY)
+    except Exception as e:
+        print('If github is not available, you can set USE_PROXY to True and set PROXIES.')
+        print('Exception', e)
+    return ret
+
+
+def get_latest_version():
+    """get latest version info"""
+    print('get latest version info')
+    url = f'https://api.github.com/repos/{REPO_NAME}/releases/latest'
+    print(url)
+    res = requests_get(url)
+    version_info = {'name': res.json()['name']}
+
+    # zipball_url 就是源码
+    # version_info['zipball_url'] = res.json()['zipball_url']
+
+    patterns = {
+        'linux': r'trilium-linux-x64-[0-9\.]+.tar.xz',
+        'linux-server': r'trilium-linux-x64-server-[0-9\.]+.tar.xz',
+        'windows': r'trilium-windows-x64-[0-9\.]+.zip',
+        'mac': r'trilium-mac-x64-[0-9\.]+.zip',
+    }
+
+    releases = {}
+
+    for x in res.json()['assets']:
+        for package_type in patterns:
+            if re.match(patterns[package_type], x['name']):
+                releases[package_type] = {
+                    'name': x['name'],
+                    'url': x['browser_download_url']
+                }
+    version_info['releases'] = releases
+    return version_info
+
+
+def download_file(url, file_name=None):
+    """download file"""
+    print('download file')
+    if not file_name:
+        file_name = url.split('/')[-1]
+    print('downloading ...')
+    if DO_DOWNLOAD:
+        with requests.get(url, proxies=PROXIES, verify=False, stream=True) as r:
+            r.raise_for_status()
+            with open(file_name, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+    print(f'download complete, file saved as {file_name}')
+    return file_name
+
+
+def download_releases(releases):
+    for package_type in releases:
+        if DEBUG:
+            if package_type != 'linux':
+                continue
+        release = releases[package_type]
+        download_file(release['url'], TRANS_RELEASE_FOLDER + release['name'])
+
 
 def decompress_package(file_name):
     print(f'decompress {file_name}')
@@ -233,24 +308,26 @@ def patch_mac(file_name):
 
     return new_name
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
+ 
     os.chdir(TRANS_RELEASE_FOLDER)
 
-
+ 
+    # 打补丁
     # patch
 
     # linux
-    patch_linux(trilium-linux-x64.tar.xz)
+    patch_linux(releases['linux']['name'])
 
     if DEBUG:
         os.system(f'xdg-open {TRANS_RELEASE_FOLDER}')
     else:
         # linux-server
-        patch_linux_server(trilium-linux-x64-server.tar.xz)
+        patch_linux_server(releases['linux-server']['name'])
 
         # windows
-        patch_windows(trilium-windows-x64.zip)
+        patch_windows(releases['windows']['name'])
 
         # mac
-        patch_mac(trilium-mac-x64.zip)
+        patch_mac(releases['mac']['name'])
