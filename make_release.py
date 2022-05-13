@@ -18,7 +18,8 @@ REPO_NAME = 'zadam/trilium'
 TRANS_RELEASE_FOLDER = '/workdir/trilium-trans-release/'
 PATCH_FOLDER = '/workdir/trilium-trans-patch/'
 BASE_FOLDER = '/workdir/trilium-trans/'
-
+VERSION_INFO_OVERRIDE = False
+VERSION_INFO_OVERRIDE_BETA = False
 DO_DOWNLOAD = False
 
 # 是否删除临时文件
@@ -314,6 +315,18 @@ if __name__ == '__main__':
     os.chdir(TRANS_RELEASE_FOLDER)
 
  
+    if VERSION_INFO_OVERRIDE:
+        if VERSION_INFO_OVERRIDE_BETA:
+            version_info = force_version_info_full_beta
+        else:
+            version_info = force_version_info_full
+    else:
+        version_info = get_latest_version()
+    print('version_info', version_info)
+
+    # 下载
+    # download
+    releases = version_info['releases']
     # 打补丁
     # patch
 
