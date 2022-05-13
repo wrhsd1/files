@@ -266,7 +266,7 @@ def patch_mac(file_name):
 
     asar_folder = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources"
     asar_path = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/app.asar"
-    print(${MACASARP})
+    print(f"${MACASARP}")
 
     # asar解包
     # asar unpack
