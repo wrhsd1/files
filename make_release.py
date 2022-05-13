@@ -233,13 +233,6 @@ def patch_mac(file_name):
 
     return new_name
 
-
-if __name__ == '__main__':
-
-    a = input(f'Delete folder {TRANS_RELEASE_FOLDER}, continue?(y)')
-    if a not in ['y', ]:
-        exit()
-
     os.system(f'rm -rf {TRANS_RELEASE_FOLDER}')
     os.makedirs(f'{TRANS_RELEASE_FOLDER}')
     os.chdir(TRANS_RELEASE_FOLDER)
