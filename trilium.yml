@@ -1,0 +1,119 @@
+name: build
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Initialization environment
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo pip3 install requests --user
+        curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        sudo -E apt-get -qq install nodejs
+        sudo -E apt-get -qq install build-essential        
+        npm install -g asar
+        npm install -g webpack
+        npm install -g webpack-cli        
+        sudo mkdir -p /workdir
+        sudo mkdir -p /workdir/trilium-trans-release
+        sudo chmod -R 777 /workdir
+        rm translations.py && cp translations_cn.py translations.py
+        git clone https://github.com/zadam/trilium.git /workdir/trilium-trans/trilium-src
+        ls
+        
+    - name: Download
+      run: |
+        cd /workdir/trilium-trans/trilium-src
+        curl -sL https://raw.githubusercontent.com/wrhsd1/files/main/download.sh  | sudo -E bash -  
+                
+    - name: Translate
+      run: |
+        wget https://raw.githubusercontent.com/wrhsd1/files/main/trans.py
+        python3 trans.py
+        
+    - name: Docker Pre
+      id: tag
+      run: |
+        cd /workdir/trilium-trans/trilium-src
+        cp -r /workdir/trilium-trans-patch/* /workdir/trilium-trans/trilium-src
+        curl -sL https://raw.githubusercontent.com/wrhsd1/files/main/version.sh  | sudo -E bash -   
+        echo "::set-output name=release_tag::$VERSION"    
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+        
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=today::$(date +'%Y-%m-%d')"
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: /workdir/trilium-trans/trilium-src/
+        file: /workdir/trilium-trans/trilium-src/Dockerfile
+        platforms: linux/arm64,linux/amd64
+        push: true
+        tags: |
+          wrhsd/trilium-cn:latest
+          wrhsd/trilium-cn:${{ steps.date.outputs.today }} 
+          
+    - name: Package
+      run: |
+        wget https://raw.githubusercontent.com/wrhsd1/files/main/make_release.py
+        python3 make_release.py    
+        cd /workdir/trilium-trans-release
+        ls
+    
+    - name: preUpload
+      run: |
+        cd /workdir/trilium-trans-release
+        mv trilium-linux-x64-*.xz trilium-linux-x64-latest.tar.xz
+        mv trilium-linux-x64-server-*.tar.xz trilium-linux-x64-server-latest.tar.xz
+        mv trilium-mac-x64-*.zip trilium-mac-x64-latest.zip
+        mv trilium-windows-x64-*.zip trilium-windows-x64-latest.zip
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    
+        
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: /workdir/trilium-trans-release/*
+        asset_name: |
+          trilium-linux-x64-latest.tar.xz
+          trilium-linux-x64-server-latest.tar.xz
+          trilium-mac-x64-latest.zip
+          trilium-windows-x64-latest.zip          
+        asset_content_type: application/gzip
