@@ -270,7 +270,7 @@ def patch_mac(file_name):
 
     # asar解包
     # asar unpack
-    os.chdir("$asar_folder")
+    os.chdir("/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources")
     os.system('asar extract app.asar ./app/')
 
     # 打补丁
