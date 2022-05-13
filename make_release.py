@@ -266,16 +266,16 @@ def patch_mac(file_name):
 
     asar_folder = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources"
     asar_path = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/app.asar"
-    print("/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/app.asar")
+    print(${MACASARP})
 
     # asar解包
     # asar unpack
-    os.chdir("/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources")
+    os.chdir(${MACASARF})
     os.system('asar extract app.asar ./app/')
 
     # 打补丁
     # apply patch
-    os.system(f'cp -rf {PATCH_FOLDER}* "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/app/"')
+    os.system(f'cp -rf {PATCH_FOLDER}* ${MACASARA}')
 
     # asar封包
     # asar pack
@@ -283,7 +283,7 @@ def patch_mac(file_name):
 
     # 删除解包文件
     # remove unpacked files
-    cmd = f'rm -rf "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/app/"'
+    cmd = f'rm -rf ${MACASARA}'
     print('cmd', cmd)
     os.system(cmd)
 
