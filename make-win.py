@@ -62,11 +62,11 @@ def patch_windows(file_name):
         print('windows 文件名有问题')
         exit()
 
-    file_path = TRANS_RELEASE_FOLDER + file_name
+    file_path = TRANS_RELEASE_FOLDER_WIN + file_name
     print('file_path', file_path)
     decompress_package(file_path)
 
-    asar_folder = TRANS_RELEASE_FOLDER + 'trilium-windows-x64/resources'
+    asar_folder = TRANS_RELEASE_FOLDER_WIN + 'trilium-windows-x64/resources'
     asar_path = asar_folder + '/app.asar'
     print(asar_path)
 
@@ -92,7 +92,7 @@ def patch_windows(file_name):
     print('new_name', new_name)
     os.system(f'rm -f {new_name}')
     patched_root_folder = 'trilium-windows-x64'
-    os.chdir(TRANS_RELEASE_FOLDER)
+    os.chdir(TRANS_RELEASE_FOLDER_WIN)
     if COMPRESS_TOOL == '7z':
         cmd = f'7z a {new_name} -r {patched_root_folder}'
     else:
