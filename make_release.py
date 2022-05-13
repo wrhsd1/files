@@ -241,16 +241,16 @@ if __name__ == '__main__':
     # patch
 
     # linux
-    patch_linux(releases['linux']['name'])
+    patch_linux(trilium-linux-x64.tar.xz)
 
     if DEBUG:
         os.system(f'xdg-open {TRANS_RELEASE_FOLDER}')
     else:
         # linux-server
-        patch_linux_server(releases['linux-server']['name'])
+        patch_linux_server(trilium-linux-x64-server.tar.xz)
 
         # windows
-        patch_windows(releases['windows']['name'])
+        patch_windows(trilium-windows-x64.zip)
 
         # mac
-        patch_mac(releases['mac']['name'])
+        patch_mac(trilium-mac-x64.zip)
