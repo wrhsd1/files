@@ -264,7 +264,7 @@ def patch_mac(file_name):
     print('file_path', file_path)
     decompress_package(file_path)
 
-    asar_folder = TRANS_RELEASE_FOLDER + 'trilium-mac-x64/Trilium Notes.app/Contents/Resources'
+    asar_folder = TRANS_RELEASE_FOLDER + '"trilium-mac-x64/Trilium Notes.app/Contents/Resources"'
     asar_path = asar_folder + '/app.asar'
     print(asar_path)
 
