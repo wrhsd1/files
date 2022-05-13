@@ -1,7 +1,9 @@
 name: build
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'
   
 jobs:
   build:
@@ -36,6 +38,7 @@ jobs:
       run: |
         cd /workdir/trilium-trans/trilium-src
         curl -sL https://raw.githubusercontent.com/wrhsd1/files/main/download.sh  | sudo -E bash -  
+        sudo chmod -R 777 /workdir
                 
     - name: Translate
       run: |
@@ -81,39 +84,12 @@ jobs:
         wget https://raw.githubusercontent.com/wrhsd1/files/main/make_release.py
         python3 make_release.py    
         cd /workdir/trilium-trans-release
-        ls
-    
-    - name: preUpload
-      run: |
-        cd /workdir/trilium-trans-release
-        mv trilium-linux-x64-*.xz trilium-linux-x64-latest.tar.xz
-        mv trilium-linux-x64-server-*.tar.xz trilium-linux-x64-server-latest.tar.xz
-        mv trilium-mac-x64-*.zip trilium-mac-x64-latest.zip
-        mv trilium-windows-x64-*.zip trilium-windows-x64-latest.zip
-    
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-    
+        ls        
         
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: /workdir/trilium-trans-release/*
-        asset_name: |
-          trilium-linux-x64-latest.tar.xz
-          trilium-linux-x64-server-latest.tar.xz
-          trilium-mac-x64-latest.zip
-          trilium-windows-x64-latest.zip          
-        asset_content_type: application/gzip
+    - name: Upload to WeTransfer
+      id: wetransfer
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer wet -s -p 16 --no-progress /workdir/trilium-trans-release/* 2>&1 | tee wetransfer.log
+        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+        echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
