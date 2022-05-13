@@ -63,11 +63,11 @@ def patch_linux(file_name):
         print('linux client wrong file name')
         exit()
 
-    file_path = TRANS_RELEASE_FOLDER + file_name
+    file_path = TRANS_RELEASE_FOLDER_LINUX + file_name
     print('file_path', file_path)
     decompress_package(file_path)
 
-    asar_folder = TRANS_RELEASE_FOLDER + 'trilium-linux-x64/resources'
+    asar_folder = TRANS_RELEASE_FOLDER_LINUX + 'trilium-linux-x64/resources'
     asar_path = asar_folder + '/app.asar'
     print(asar_path)
 
@@ -95,7 +95,7 @@ def patch_linux(file_name):
         print('new_name', new_name)
         os.system(f'rm -f {new_name}')
         patched_root_folder = 'trilium-linux-x64'
-        os.chdir(TRANS_RELEASE_FOLDER)
+        os.chdir(TRANS_RELEASE_FOLDER_LINUX)
 
         if COMPRESS_TOOL == '7z':
             cmd = f'7z a {new_name} -r {patched_root_folder}'
@@ -117,4 +117,4 @@ for flinux in list_data:
     # patch
 
     # linux
-    patch_mac(flinux)
+    patch_linux(flinux)
