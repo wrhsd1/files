@@ -107,8 +107,9 @@ def patch_mac(file_name):
 
     return new_name
 
+if __name__ == '__main__':
 
-fname = os.path.basename(TRANS_RELEASE_FOLDER_MAC)
+    fname = os.path.basename(TRANS_RELEASE_FOLDER_MAC)
 
  
     # 打补丁
