@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+git clone https://github.com/zadam/trilium.git /workdir/trilium-trans/trilium-src
+cd /workdir/trilium-trans/trilium-src
+
 VERSION=`jq -r ".version" package.json`
 
-git clone https://github.com/zadam/trilium.git /workdir/trilium-trans/trilium-src
+
 wget https://github.com/zadam/trilium/releases/download/v{VERSION}/trilium-linux-x64-{VERSION}.tar.xz
 tar -xf trilium-linux-x64-{VERSION}.tar.xz && mv trilium-linux-x64 /workdir/trilium-trans/
 cd /workdir/trilium-trans-release
