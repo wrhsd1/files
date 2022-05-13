@@ -256,6 +256,9 @@ def patch_windows(file_name):
 
 
 def patch_mac(file_name):
+    cmd = "export MACASARF='/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/'; echo ${MACASARF}" 
+    os.system(cmd)
+    
     if not file_name.endswith('.zip'):
         print('windows 文件名有问题')
         exit()
@@ -266,7 +269,7 @@ def patch_mac(file_name):
 
     asar_folder = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources"
     asar_path = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/app.asar"
-    print(f"${MACASARP}")
+    print(f"${MACASARF}app.asar")
 
     # asar解包
     # asar unpack
@@ -275,7 +278,7 @@ def patch_mac(file_name):
 
     # 打补丁
     # apply patch
-    os.system(f'cp -rf {PATCH_FOLDER}* ${MACASARA}')
+    os.system(f'cp -rf {PATCH_FOLDER}* ${MACASARF}app/')
 
     # asar封包
     # asar pack
@@ -283,7 +286,7 @@ def patch_mac(file_name):
 
     # 删除解包文件
     # remove unpacked files
-    cmd = f'rm -rf ${MACASARA}'
+    cmd = f'rm -rf ${MACASARF}app/'
     print('cmd', cmd)
     os.system(cmd)
 
