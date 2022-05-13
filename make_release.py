@@ -256,9 +256,6 @@ def patch_windows(file_name):
 
 
 def patch_mac(file_name):
-    cmd = "export MACASARF='/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources'; echo $MACASARF" 
-    os.system(cmd)
-    
     if not file_name.endswith('.zip'):
         print('windows 文件名有问题')
         exit()
@@ -266,19 +263,19 @@ def patch_mac(file_name):
     file_path = TRANS_RELEASE_FOLDER + file_name
     print('file_path', file_path)
     decompress_package(file_path)
-
-    asar_folder = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources"
-    asar_path = "/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app/Contents/Resources/app.asar"
-    print(f"$MACASARF/app.asar")
+    os.rename("/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app","/workdir/trilium-trans-release/trilium-mac-x64/Trilium-Notes.app")
+    asar_folder = TRANS_RELEASE_FOLDER + 'trilium-mac-x64/Trilium-Notes.app/Contents/Resources'
+    asar_path = asar_folder + '/app.asar'
+    print(asar_path)
 
     # asar解包
     # asar unpack
-    os.chdir($MACASARF)
+    os.chdir(asar_folder)
     os.system('asar extract app.asar ./app/')
 
     # 打补丁
     # apply patch
-    os.system(f'cp -rf {PATCH_FOLDER}* $MACASARF/app/')
+    os.system(f'cp -rf {PATCH_FOLDER}* "{asar_folder}/app/"')
 
     # asar封包
     # asar pack
@@ -286,12 +283,13 @@ def patch_mac(file_name):
 
     # 删除解包文件
     # remove unpacked files
-    cmd = f'rm -rf $MACASARF/app/'
+    cmd = f'rm -rf "{asar_folder}/app/"'
     print('cmd', cmd)
     os.system(cmd)
-
+    
     # 打zip包
     # make zip package
+    os.rename("/workdir/trilium-trans-release/trilium-mac-x64/Trilium-Notes.app","/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app")
     new_name = f'trilium-{LANG}-mac-x64.zip'
     print('new_name', new_name)
     os.system(f'rm -f {new_name}')
