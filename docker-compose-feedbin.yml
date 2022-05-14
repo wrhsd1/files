@@ -54,6 +54,8 @@ services:
       - feedbin-redis
       - feedbin-postgres
     command: bundle exec rails s --port $PORT --binding 0.0.0.0
+    ports:
+      - $PORT:$PORT
     restart: always
 
   feedbin-workers:
@@ -105,6 +107,8 @@ services:
       - EXTRACT_USER=$EXTRACT_USER
       - EXTRACT_SECRET=$EXTRACT_SECRET
     container_name: feedbin-extract
+    ports:
+      - 3000:3000
     restart: always
 
   camo:
@@ -113,7 +117,9 @@ services:
     environment:
       - PORT=8081
       - CAMO_KEY
-    restart: always    
+    restart: always  
+    ports:
+      - 8081:8081
 
   feedbin-memcached:
     image: memcached:1.6-alpine
