@@ -263,7 +263,7 @@ def patch_mac(file_name):
     file_path = TRANS_RELEASE_FOLDER + file_name
     print('file_path', file_path)
     decompress_package(file_path)
-    os.rename("/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app","/workdir/trilium-trans-release/trilium-mac-x64/Trilium-Notes.app")
+    
     asar_folder = TRANS_RELEASE_FOLDER + 'trilium-mac-x64/Trilium-Notes.app/Contents/Resources'
     asar_path = asar_folder + '/app.asar'
     print(asar_path)
@@ -289,7 +289,6 @@ def patch_mac(file_name):
     
     # 打zip包
     # make zip package
-    os.rename("/workdir/trilium-trans-release/trilium-mac-x64/Trilium-Notes.app","/workdir/trilium-trans-release/trilium-mac-x64/Trilium Notes.app")
     new_name = f'trilium-{LANG}-mac-x64.zip'
     print('new_name', new_name)
     os.system(f'rm -f {new_name}')
@@ -333,7 +332,7 @@ if __name__ == '__main__':
     # patch
 
     # linux
-    patch_mac(releases['mac']['name'])
+    patch_linux(releases['linux']['name'])
     if DEBUG:
         os.system(f'xdg-open {TRANS_RELEASE_FOLDER}')
     else:
